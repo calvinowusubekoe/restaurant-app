@@ -10,6 +10,7 @@ import {
   Flex,
   Card,
   CardBody,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -40,20 +41,11 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.600', 'gray.200');
   const quoteColor = useColorModeValue('orange.200', 'orange.500');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <Box bg={bgColor} py={12} id="testimonials">
@@ -72,112 +64,85 @@ export default function Testimonials() {
         </Stack>
 
         <Box position="relative" px={4}>
-          {/* Testimonial Cards */}
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: currentTestimonial === index ? 1 : 0,
-                y: currentTestimonial === index ? 0 : 20,
-                position: currentTestimonial === index ? 'relative' : 'absolute',
-              }}
-              transition={{ duration: 0.5 }}
-              style={{
-                width: '100%',
-                top: 0,
-                display: currentTestimonial === index ? 'block' : 'none'
-              }}
-            >
-              <Card
-                maxW={'600px'}
-                mx={'auto'}
-                bg={cardBg}
-                boxShadow={'lg'}
-                rounded={'xl'}
-                border="1px solid"
-                borderColor={borderColor}
-                p={4}
-                position="relative"
-                overflow="hidden"
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
               >
-                <CardBody p={4}>
-                  <Stack spacing={6} align={'center'} position="relative">
-                    <Icon 
-                      as={FaQuoteLeft} 
-                      w={8} 
-                      h={8} 
-                      color={quoteColor}
-                      position="absolute"
-                      top={0}
-                      left={2}
-                      opacity={0.3}
-                    />
-                    
-                    <Avatar
-                      src={testimonial.avatar}
-                      size={'lg'}
-                      border={'2px solid'}
-                      borderColor={'orange.400'}
-                    />
+                <Card
+                  bg={cardBg}
+                  boxShadow={'lg'}
+                  rounded={'xl'}
+                  border="1px solid"
+                  borderColor={borderColor}
+                  p={4}
+                  position="relative"
+                  overflow="hidden"
+                >
+                  <CardBody p={4}>
+                    <Stack spacing={6} align={'center'} position="relative">
+                      <Icon 
+                        as={FaQuoteLeft} 
+                        w={8} 
+                        h={8} 
+                        color={quoteColor}
+                        position="absolute"
+                        top={0}
+                        left={2}
+                        opacity={0.3}
+                      />
+                      
+                      <Avatar
+                        src={testimonial.avatar}
+                        size={'lg'}
+                        border={'2px solid'}
+                        borderColor={'orange.400'}
+                      />
 
-                    <Stack spacing={2} align={'center'} maxW={'500px'}>
-                      <Text
-                        fontSize={{ base: 'md', md: 'lg' }}
-                        fontWeight={'medium'}
-                        textAlign={'center'}
-                        color={useColorModeValue('gray.800', 'white')}
-                        position="relative"
-                        zIndex={1}
-                        lineHeight="1.6"
-                      >
-                        {testimonial.content}
-                      </Text>
+                      <Stack spacing={2} align={'center'} maxW={'500px'}>
+                        <Text
+                          fontSize={{ base: 'md', md: 'lg' }}
+                          fontWeight={'medium'}
+                          textAlign={'center'}
+                          color={useColorModeValue('gray.800', 'white')}
+                          position="relative"
+                          zIndex={1}
+                          lineHeight="1.6"
+                        >
+                          {testimonial.content}
+                        </Text>
 
-                      <Stack spacing={1} align={'center'} pt={2}>
-                        <Text fontWeight={600} fontSize={'md'}>
-                          {testimonial.name}
-                        </Text>
-                        <Text fontSize={'sm'} color={textColor}>
-                          {testimonial.role}
-                        </Text>
-                        <Flex mt={1}>
-                          {[...Array(testimonial.rating)].map((_, i) => (
-                            <Icon
-                              key={i}
-                              as={FaStar}
-                              w={3.5}
-                              h={3.5}
-                              color={'orange.400'}
-                              mr={0.5}
-                            />
-                          ))}
-                        </Flex>
+                        <Stack spacing={1} align={'center'} pt={2}>
+                          <Text fontWeight={600} fontSize={'md'}>
+                            {testimonial.name}
+                          </Text>
+                          <Text fontSize={'sm'} color={textColor}>
+                            {testimonial.role}
+                          </Text>
+                          <Flex mt={1}>
+                            {[...Array(testimonial.rating)].map((_, i) => (
+                              <Icon
+                                key={i}
+                                as={FaStar}
+                                w={3.5}
+                                h={3.5}
+                                color={'orange.400'}
+                                mr={0.5}
+                              />
+                            ))}
+                          </Flex>
+                        </Stack>
                       </Stack>
                     </Stack>
-                  </Stack>
-                </CardBody>
-              </Card>
-            </motion.div>
-          ))}
-
-          {/* Dots indicator */}
-          <Flex justify="center" mt={4}>
-            {testimonials.map((_, index) => (
-              <Box
-                key={index}
-                as="button"
-                mx={1}
-                w={1.5}
-                h={1.5}
-                borderRadius="full"
-                bg={currentTestimonial === index ? 'orange.500' : 'gray.300'}
-                onClick={() => setCurrentTestimonial(index)}
-                transition="background-color 0.3s"
-                _hover={{ bg: 'orange.400' }}
-              />
+                  </CardBody>
+                </Card>
+              </motion.div>
             ))}
-          </Flex>
+          </SimpleGrid>
         </Box>
       </Container>
     </Box>
