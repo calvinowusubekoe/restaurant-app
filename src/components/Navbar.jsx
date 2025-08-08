@@ -15,16 +15,15 @@ import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 
-const NavLink = ({ children, href, isActive, onClick }) => {
+const NavLink = ({ children, href, isActive, onClick, w }) => {
   const handleClick = (e) => {
     e.preventDefault();
     const targetId = href.substring(1);
     const element = document.getElementById(targetId);
     
     if (element) {
-      const navbarHeight = 80; // Height of your fixed navbar
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+      const navbarHeight = 60; // Match your navbar's minH value
+      const offsetPosition = element.offsetTop - navbarHeight;
 
       window.scrollTo({
         top: offsetPosition,
@@ -54,6 +53,8 @@ const NavLink = ({ children, href, isActive, onClick }) => {
       fontWeight="medium"
       transition="all 0.3s ease"
       onClick={handleClick}
+      w={w}        // Add width prop
+      display="block" // Make link a block element
     >
       {children}
     </Box>
@@ -181,6 +182,9 @@ export default function Navbar() {
                   p={4}
                   display={{ md: 'none' }}
                   spacing={4}
+                  direction="column" // Ensure vertical stacking
+                  align="start"    // Align items to the start
+                  w="100%"        // Full width
                 >
                   {navItems.map((item) => (
                     <NavLink
@@ -188,6 +192,7 @@ export default function Navbar() {
                       href={item.href}
                       isActive={activeSection === item.href.substring(1)}
                       onClick={handleNavClick}
+                      w="100%"    // Make links full width
                     >
                       {item.name}
                     </NavLink>
@@ -200,4 +205,4 @@ export default function Navbar() {
       </Container>
     </Box>
   );
-} 
+}

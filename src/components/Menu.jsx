@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Box,
   SimpleGrid,
@@ -11,15 +12,143 @@ import {
   HStack,
   Icon,
   Divider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FaStar } from 'react-icons/fa';
 
-const MenuItem = ({ title, description, price, image, rating, category }) => {
+// Example additional food data by category
+const foodVarieties = {
+  Seafood: [
+    {
+      title: 'Grilled Salmon',
+      description: 'Fresh Atlantic salmon with herbs and lemon butter sauce.',
+      price: '29.99',
+      image: 'https://images.unsplash.com/photo-1485921325833-c519f76c4927?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Lobster Thermidor',
+      description: 'Fresh lobster in a rich brandy cream sauce.',
+      price: '42.99',
+      image: 'https://res.cloudinary.com/dswfnaydo/image/upload/v1741111785/A_gourmet_Lobster_Thermidor_dish_elegantly_plated._lgdy5w.webp',
+    },
+    {
+      title: 'Seafood Paella',
+      description: 'Spanish rice dish with shrimp, mussels, and calamari.',
+      price: '35.99',
+      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Garlic Butter Shrimp',
+      description: 'Juicy shrimp sautéed in garlic butter sauce.',
+      price: '27.99',
+      image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Crab Cakes',
+      description: 'Golden crab cakes served with spicy aioli.',
+      price: '24.99',
+      image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Fried Calamari',
+      description: 'Crispy calamari rings with lemon and marinara.',
+      price: '19.99',
+      image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=800&q=80',
+    },
+  ],
+  Meat: [
+    {
+      title: 'Beef Tenderloin',
+      description: 'Premium cut with roasted vegetables.',
+      price: '34.99',
+      image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Pasta Carbonara',
+      description: 'Creamy pasta with bacon, eggs, and parmesan cheese.',
+      price: '32.99',
+      image: 'https://res.cloudinary.com/dswfnaydo/image/upload/v1741111410/A_delicious_plate_of_creamy_pasta_aijzme.webp',
+    },
+    {
+      title: 'Grilled Ribeye Steak',
+      description: 'Juicy ribeye steak grilled to perfection.',
+      price: '39.99',
+      image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Lamb Chops',
+      description: 'Herb-crusted lamb chops with mint sauce.',
+      price: '36.99',
+      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'BBQ Ribs',
+      description: 'Slow-cooked pork ribs glazed with BBQ sauce.',
+      price: '28.99',
+      image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Chicken Parmesan',
+      description: 'Breaded chicken breast topped with marinara and cheese.',
+      price: '22.99',
+      image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=800&q=80',
+    },
+  ],
+  Vegetarian: [
+    {
+      title: 'Mushroom Risotto',
+      description: 'Creamy Arborio rice with wild mushrooms.',
+      price: '24.99',
+      image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Vegetable Wellington',
+      description: 'Roasted vegetables in crispy puff pastry.',
+      price: '26.99',
+      image: 'https://res.cloudinary.com/dswfnaydo/image/upload/v1741111409/A_vibrant_vegetarian_salad_served_in_a_rustic_bowl._lmjmxq.webp',
+    },
+    {
+      title: 'Caprese Salad',
+      description: 'Fresh mozzarella, tomatoes, and basil with balsamic glaze.',
+      price: '16.99',
+      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Stuffed Bell Peppers',
+      description: 'Bell peppers stuffed with quinoa and veggies.',
+      price: '18.99',
+      image: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Eggplant Parmesan',
+      description: 'Breaded eggplant baked with marinara and cheese.',
+      price: '20.99',
+      image: 'https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+      title: 'Greek Salad',
+      description: 'Crisp lettuce, olives, feta, and tomatoes.',
+      price: '15.99',
+      image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=800&q=80',
+    },
+  ],
+};
+
+const MenuItem = ({ title, description, price, image, rating, category, onClick }) => {
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      style={{ cursor: 'pointer' }}
     >
       <Box
         bg={useColorModeValue('white', 'gray.800')}
@@ -100,6 +229,9 @@ const MenuItem = ({ title, description, price, image, rating, category }) => {
 };
 
 export default function Menu() {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isModalOpen, setModalOpen] = useState(false);
+
   const menuItems = [
     {
       title: 'Grilled Salmon',
@@ -151,6 +283,16 @@ export default function Menu() {
     },
   ];
 
+  const handleMenuItemClick = (category) => {
+    setSelectedCategory(category);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedCategory(null);
+  };
+
   return (
     <Box
       py={20}
@@ -197,11 +339,42 @@ export default function Menu() {
               transition={{ duration: 0.8, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <MenuItem {...item} />
+              <MenuItem {...item} onClick={() => handleMenuItemClick(item.category)} />
             </motion.div>
           ))}
         </SimpleGrid>
+
+        {/* Modal for more food varieties */}
+        <Modal isOpen={isModalOpen} onClose={handleCloseModal} size="xl" isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              More {selectedCategory} Dishes
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                {selectedCategory &&
+                  foodVarieties[selectedCategory]?.map((food, idx) => (
+                    <Box key={idx} borderWidth="1px" borderRadius="lg" overflow="hidden">
+                      <Image src={food.image} alt={food.title} w="100%" h="150px" objectFit="cover" />
+                      <Box p={4}>
+                        <Heading fontSize="md">{food.title}</Heading>
+                        <Text fontSize="sm" color="gray.500">{food.description}</Text>
+                        <Text fontWeight="bold" color="orange.500">${food.price}</Text>
+                      </Box>
+                    </Box>
+                  ))}
+              </SimpleGrid>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="orange" onClick={handleCloseModal}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Container>
     </Box>
   );
-} 
+}
